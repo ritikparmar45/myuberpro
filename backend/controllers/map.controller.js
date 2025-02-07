@@ -20,9 +20,7 @@ module.exports.getCoordinates = async (req, res, next) => {
 }
 
 module.exports.getDistanceTime = async (req, res, next) => {
-
     try {
-
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
@@ -31,7 +29,7 @@ module.exports.getDistanceTime = async (req, res, next) => {
         const { origin, destination } = req.query;
 
         const distanceTime = await mapService.getDistanceTime(origin, destination);
-
+        console.log(distanceTime)
         res.status(200).json(distanceTime);
 
     } catch (err) {

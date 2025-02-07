@@ -3,12 +3,12 @@ const captainModel = require('../models/captain.model');
 
 module.exports.getAddressCoordinate = async (address) => {
     const apiKey = process.env.GOOGLE_MAPS_API;
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
+    const url = `https://maps.gomaps.pro/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
 
     try {
         const response = await axios.get(url);
         if (response.data.status === 'OK') {
-            const location = response.data.results[ 0 ].geometry.location;
+            const location = response.data.results[0].geometry.location;
             return {
                 ltd: location.lat,
                 lng: location.lng
@@ -22,35 +22,35 @@ module.exports.getAddressCoordinate = async (address) => {
     }
 }
 
+
+
 module.exports.getDistanceTime = async (origin, destination) => {
     if (!origin || !destination) {
         throw new Error('Origin and destination are required');
     }
 
     const apiKey = process.env.GOOGLE_MAPS_API;
-
-    const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(origin)}&destinations=${encodeURIComponent(destination)}&key=${apiKey}`;
-
+    const url = `https://maps.gomaps.pro/maps/api/directions/json?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&key=${apiKey}`;
     try {
-
-
         const response = await axios.get(url);
         if (response.data.status === 'OK') {
-
-            if (response.data.rows[ 0 ].elements[ 0 ].status === 'ZERO_RESULTS') {
-                throw new Error('No routes found');
-            }
-
-            return response.data.rows[ 0 ].elements[ 0 ];
+            const route = response.data.routes[0];
+            const leg = route.legs[0];
+          //  console.log(leg.distance.text)
+          //  console.log(leg.duration.text)
+            return {
+                distance: leg.distance.text, // Distance in human-readable format (e.g., "12.5 km")
+                duration: leg.duration.text  // Estimated travel time (e.g., "25 mins")
+            };
         } else {
             throw new Error('Unable to fetch distance and time');
         }
-
     } catch (err) {
         console.error(err);
         throw err;
     }
 }
+
 
 module.exports.getAutoCompleteSuggestions = async (input) => {
     if (!input) {
@@ -58,7 +58,7 @@ module.exports.getAutoCompleteSuggestions = async (input) => {
     }
 
     const apiKey = process.env.GOOGLE_MAPS_API;
-    const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&key=${apiKey}`;
+    const url = `https://maps.gomaps.pro/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&key=${apiKey}`;
 
     try {
         const response = await axios.get(url);
@@ -81,7 +81,7 @@ module.exports.getCaptainsInTheRadius = async (ltd, lng, radius) => {
     const captains = await captainModel.find({
         location: {
             $geoWithin: {
-                $centerSphere: [ [ ltd, lng ], radius / 6371 ]
+                $centerSphere: [[ltd, lng], radius / 6371]
             }
         }
     });
