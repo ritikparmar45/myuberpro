@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 
 
 const FinishRide = (props) => {
-/*
+
     const navigate = useNavigate()
 
     async function endRide() {
@@ -24,7 +24,7 @@ const FinishRide = (props) => {
             navigate('/captain-home')
         }
 
-    }*/
+    }
 
     return (
         <div>
