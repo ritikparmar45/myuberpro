@@ -6,19 +6,22 @@ import axios from 'axios';
 const UserLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const { setUser } = useContext(UserDataContext);
   const navigate = useNavigate();
 
   const submitHandler = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError('');
 
     try {
       const userData = {
         email: email,
         password: password,
       };
-
 
       const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/login`, userData);
 
@@ -30,9 +33,11 @@ const UserLogin = () => {
       }
     } catch (error) {
       console.error('Login error:', error);
-      alert(error.response?.data?.message || 'Something went wrong. Please try again.');
+      setError(error.response?.data?.message || 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
     }
-    
+
     setEmail('');
     setPassword('');
   };
@@ -67,10 +72,13 @@ const UserLogin = () => {
             placeholder="password"
           />
 
+          {error && <p className="text-red-500 mb-3">{error}</p>}
+
           <button
             className="bg-[#111] text-white font-semibold mb-3 rounded-lg px-4 py-2 w-full text-lg placeholder:text-base"
+            disabled={loading}
           >
-            Login
+            {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
         <p className="text-center">
